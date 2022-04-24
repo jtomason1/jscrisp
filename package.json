@@ -1,0 +1,11 @@
+{
+  "name": "jscrisp",
+  "version": "1.0.0",
+  "description": "Human Readable Code anywhere in JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Josh Mason",
+  "license": "ISC"
+}
