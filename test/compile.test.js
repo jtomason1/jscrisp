@@ -48,8 +48,9 @@ function testCompileResult(){
       
         const result = compile(src);
         fs.writeFileSync('./test/test.crisp.js', result)
-        const { Test_Login }= require('./test.crisp.js');
+        const { Test_Login, Login, Gherkin_Example }= require('./test.crisp.js');
         Test_Login();
+        Gherkin_Example(Login)
     } catch (err) {
       console.error(err)
     }
