@@ -8,8 +8,8 @@ Functionality: Login - username, password, expected
     Check - expected
 
 Functionality: Test Login
-    Login validName, validPassword, true
-    Login validName, invalidPassword, false
+    Login - validName, validPassword, true
+    Login - validName, invalidPassword, false
 `
 
 const expected = `
