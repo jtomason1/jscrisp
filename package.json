@@ -4,7 +4,8 @@
   "description": "Human Readable Code anywhere in JS",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "buildParser": "pegjs ./src/parser/jscrisp.pegjs",
+    "test": "node ./test/index.test.js"
   },
   "author": "Josh Mason",
   "license": "ISC",
