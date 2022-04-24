@@ -10,8 +10,11 @@ Functionality: Test Login
     Login -     "validName",    "invalidPassword",      false
 
 Functionality: Gherkin Example - LoginMethod
+    // Given
     Given the user is logged in - LoginMethod
+    // When
     When the user clicks the logo
+    // Then
     Then the user is taken to the home page
 
 Functionality: Given the user is logged in - LoginMethod

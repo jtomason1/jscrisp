@@ -1,4 +1,4 @@
-const {compile} =  require('../src/jscrisp')
+const {compile, compileDir} =  require('../src/jscrisp')
 
 const src = `
 Functionality: Login - username, password, expected
@@ -57,7 +57,14 @@ function testCompileResult(){
     
 }
 
+function testCompileDir(){
+    compileDir("./test/example")
+    let {Example} = require("./example/testDir.crisp.js")
+    Example((text)=>{console.log(text)})
+}
+
 module.exports = {
     testCompile,
-    testCompileResult
+    testCompileResult,
+    testCompileDir
 }

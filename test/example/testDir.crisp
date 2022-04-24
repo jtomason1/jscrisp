@@ -1,0 +1,7 @@
+
+Functionality: Example - Test_Method
+    Run
+    Test Method - "First File..."
+    Test Method - "Also succesfully ran"
+
+var {Run} = require("./secondFile.crisp.js");

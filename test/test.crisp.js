@@ -10,8 +10,11 @@ function Test_Login(){
     Login("validName",    "invalidPassword",      false)
 }
 function Gherkin_Example(LoginMethod){
+    // Given
     Given_the_user_is_logged_in(LoginMethod)
+    // When
     When_the_user_clicks_the_logo()
+    // Then
     Then_the_user_is_taken_to_the_home_page()
 }
 function Given_the_user_is_logged_in(LoginMethod){

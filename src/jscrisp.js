@@ -1,4 +1,5 @@
-
+const fs = require("fs")
+const path = require("path")
 
 function compile(src, config){
     let result = src;
@@ -46,6 +47,7 @@ function compile(src, config){
         }
         const funcRegex = new RegExp("\\bFunctionality: .*");
         const jsLineRegex = new RegExp(".*;");
+        const jsCommentRegex = new RegExp(".*//.*");
         if(funcRegex.test(l)){
             inFunc = true;
                 
@@ -72,6 +74,8 @@ function compile(src, config){
 
             // note about starting regex: myRegex.lastIndex = 3
         }else if(jsLineRegex.test(l)){
+            return l;
+        }else if(jsCommentRegex.test(l)){
             return l;
         }else{
             let li = l.split("=");
@@ -114,7 +118,51 @@ function compile(src, config){
     return result;
 }
 
+const getAllFiles = function(dirPath, arrayOfFiles) {
+    
+    
+
+    files = fs.readdirSync(dirPath)
+
+    arrayOfFiles = arrayOfFiles || []
+
+    files.forEach(function(file) {
+        if (fs.statSync(dirPath + "/" + file).isDirectory()) {
+            arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
+        } else {
+            arrayOfFiles.push(path.join(dirPath, "/", file))
+        }
+    })
+
+    return arrayOfFiles
+}
+
+function compileDir(dirName){
+    console.log("Compiling Dir "+dirName+ " from crisp to js for:")
+    getAllFiles(dirName).forEach((file, i)=>{
+        const fileNameParts = file.split(".");
+        const extension = fileNameParts.pop();
+        if( extension == "crisp"){   
+            console.log(file)
+            try {
+                const src = fs.readFileSync(file, 'utf8')
+              
+                const result = compile(src);
+
+                fileNameParts.push("crisp");
+                fileNameParts.push("js");
+                const outputFile = fileNameParts.join(".");
+                fs.writeFileSync(outputFile, result)
+            } catch (err) {
+              console.error(err)
+            }
+        }
+    })
+    
+}
+
 module.exports = {
-    compile
+    compile,
+    compileDir
 }
 
