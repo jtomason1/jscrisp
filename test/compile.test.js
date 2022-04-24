@@ -1,5 +1,10 @@
 const {compile, compileDir} =  require('../src/jscrisp')
 
+// global log
+global.log = function log(input){
+    console.log(input);
+}
+
 const src = `
 Functionality: Login - username, password, expected
     Open Browser
