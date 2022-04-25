@@ -56,6 +56,7 @@ function testCompileResult(){
         const { Test_Login, Login, Gherkin_Example }= require('./test.crisp.js');
         Test_Login();
         Gherkin_Example(Login)
+        
     } catch (err) {
       console.error(err)
     }
@@ -66,6 +67,12 @@ function testCompileDir(){
     compileDir("./test/example")
     let {Example} = require("./example/testDir.crisp.js")
     Example((text)=>{console.log(text)})
+
+    let {Query} = require("./example/data.crisp.js")
+    let obj = {
+        log: (text)=>{console.log("Special log", text)}
+    }
+    Query(obj)
 }
 
 module.exports = {
