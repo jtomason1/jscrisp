@@ -8,8 +8,5 @@
     "test": "node ./test/index.test.js"
   },
   "author": "Josh Mason",
-  "license": "ISC",
-  "dependencies": {
-    "pegjs": "^0.10.0"
-  }
+  "license": "ISC"
 }
