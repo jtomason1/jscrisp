@@ -1,6 +1,6 @@
 {
   "name": "jscrisp",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Human Readable Code anywhere in JS",
   "main": "index.js",
   "scripts": {
