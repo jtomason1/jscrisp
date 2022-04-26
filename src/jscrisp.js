@@ -5,8 +5,8 @@ function compile(src, config){
     let result = src;
 
 
-    // const funcs = [...src.matchAll(new RegExp("\\bFunctionality: .*\n", 'g')) ]
-    // console.log(funcs)
+    const funcs = [...src.matchAll(new RegExp("\n\n", 'g')) ]
+    console.log("Dev", funcs)
     // funcs.forEach((match) => {
     //     const line = match[0];
     //     console.log("Function found at ", line);
@@ -31,7 +31,7 @@ function compile(src, config){
 
 
     const lines = src.split("\n")
-    console.log(lines);
+    // console.log(lines);
 
     let inFunc = false;
 
@@ -104,7 +104,7 @@ function compile(src, config){
 
     })
 
-    console.log(newLines);
+    // console.log(newLines);
 
     const exportLine = `module.exports = {${exports.join(",")}}`
     newLines.push(exportLine);
