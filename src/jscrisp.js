@@ -1,6 +1,22 @@
 const fs = require("fs")
 const path = require("path")
 
+const phrases = [];
+
+function replacePhrases(src){
+    let srcLines = src.split("\n");
+    let output = src;
+    srcLines.forEach((line, li)=>{
+        phrases.forEach(({phrase, func}, pi)=>{
+            const phraseRegex = phrase.replace("%s", ".*");
+            if(phraseRegex.test(line)){
+                const phraseParts = phrase.split("%s");
+                
+            }
+        })
+    })
+}
+
 function compile(src, config){
     let result = src;
 
@@ -30,25 +46,65 @@ function compile(src, config){
     // });
 
 
-    const lines = src.split("\n")
+    let lines = src.split("\n")
     // console.log(lines);
 
     let inFunc = false;
 
     let exports = [];
 
-    const newLines = lines.map((l,index)=>{
+    let scopeStack = [null];
+
+    lines = lines.filter((l,index)=>{
         if(!l || !l.trim()){
-            if(inFunc == true){
-                inFunc = false;
-                return "}"
-            }
-            return "";
+            return false;
+        }else{
+            return true;
         }
-        const funcRegex = new RegExp("\\bFunctionality: .*");
+    })
+
+    const newLines = lines.map((l,index)=>{
+
+
+        const funcRegex = new RegExp(".*: .*");
         const jsLineRegex = new RegExp(".*;");
         const jsCommentRegex = new RegExp(".*//.*");
-        if(funcRegex.test(l)){
+
+        
+
+        // above tested lines do not affect scope
+
+        let nextLine = "";
+        if(index+1<lines.length){
+            nextLine = lines[index+1];
+        }
+
+        const lineTabCount = l.length - l.trimStart().length
+        const nextLineTabCount = nextLine.length - nextLine.trimStart().length;
+        let startScope = false;
+        let endScope = false;
+
+
+        if(lineTabCount==nextLineTabCount){
+            // no change in scope
+        }else if(lineTabCount<nextLineTabCount){
+            startScope = true;
+        }else if(lineTabCount>nextLineTabCount){
+            endScope = true;
+        }
+
+        
+        console.log(l, lineTabCount, nextLineTabCount)
+
+        
+        
+        let newLine = l;
+
+        if(jsLineRegex.test(l)){
+            newLine = l;
+        }else if(jsCommentRegex.test(l)){
+            newLine = l;
+        }else if(funcRegex.test(l)){
             inFunc = true;
                 
             const line = l;
@@ -65,18 +121,14 @@ function compile(src, config){
             // console.log("Func name:", name)
             result = result.replace(new RegExp(`\b${l}\b`, 'g'), l + '{') 
 
-            let newLine = `function ${name}(${args || ''}){`
+            newLine = `function ${name}(${args || ''})`
             exports.push(name);
 
             // console.log("New line:", newLine);
 
-            return newLine;
 
             // note about starting regex: myRegex.lastIndex = 3
-        }else if(jsLineRegex.test(l)){
-            return l;
-        }else if(jsCommentRegex.test(l)){
-            return l;
+        
         }else{
             let li = l.split("=");
             let assignment = "";
@@ -96,15 +148,24 @@ function compile(src, config){
 
             const tab = inFunc ? "    " : "";
 
-            let newLine = `${tab}${assignment}${call}(${args})`
+            newLine = `${tab}${assignment}${call}(${args})`
 
-            return newLine
 
         }
 
+        
+        return `${newLine}${endScope ? "}" : ""}${startScope ? "{" : ""}`;
+
     })
 
-    // console.log(newLines);
+    while(scopeStack[scopeStack.length-1]>0 && scopeStack[scopeStack.length-1]!=null){
+        newLines.push("}")
+        scopeStack.pop();
+    }
+
+    console.log(scopeStack)
+
+    console.log(newLines);
 
     const exportLine = `module.exports = {${exports.join(",")}}`
     newLines.push(exportLine);
@@ -163,5 +224,6 @@ function compileDir(dirName){
 
 module.exports = {
     compile,
-    compileDir
+    compileDir,
+    phrases
 }

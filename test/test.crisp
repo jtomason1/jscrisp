@@ -26,4 +26,5 @@ Functionality: When the user clicks the logo
 Functionality: Then the user is taken to the home page
     console.log("On the main page!");
     
+    
 var {Open_Browser, Write_Username, Write_Password, Check} = require("./test-helper.js");
