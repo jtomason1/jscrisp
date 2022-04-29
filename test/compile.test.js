@@ -1,5 +1,7 @@
 const {compile, compileDir} =  require('../src/jscrisp')
 
+const {} = require("./test-helper.js")
+
 // global log
 global.log = function log(input){
     console.log(input);

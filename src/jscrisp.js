@@ -1,59 +1,65 @@
 const fs = require("fs")
 const path = require("path")
 
+// global phrases? May want to have some namespacing as to not get over burdened here
 const phrases = [];
 
 function replacePhrases(src){
     let srcLines = src.split("\n");
-    let output = src;
-    srcLines.forEach((line, li)=>{
+    let output = srcLines.map((line, li)=>{
+        let newLine = line;
         phrases.forEach(({phrase, func}, pi)=>{
-            const phraseRegex = phrase.replace("%s", ".*");
+            const phraseRegex = new RegExp(phrase.replace("%s", ".*"));
+            // phrase did match, convert to non-phrased function call
+
+            console.log("My phrase regex", phraseRegex)
             if(phraseRegex.test(line)){
+                console.log("FOUND IT")
                 const phraseParts = phrase.split("%s");
+
+                const funcName = func.name;
+
+                let reducedLine = phraseParts.reduce((prev, curr)=>{
+                    return prev.replace(curr, "@@");
+                }, line)
+
+                let argArr = reducedLine.split("@@").filter(v=>v).filter(v=>v.trim());
+
+                let assignment = "";
+                if(argArr.length>0){
+                    if(argArr[0].includes("=")){
+                        assignment = argArr.shift();
+                    }
+                }
+
+                const args = argArr.join(",")
+                newLine = `${assignment}${funcName} - ${args}`
+
+                console.log("NEWLINE", newLine)
                 
             }
         })
+        return newLine
     })
+
+    console.log("Replaced", output)
+
+    return output.join("\n");
 }
 
 function compile(src, config){
     let result = src;
 
-
-    const funcs = [...src.matchAll(new RegExp("\n\n", 'g')) ]
-    console.log("Dev", funcs)
-    // funcs.forEach((match) => {
-    //     const line = match[0];
-    //     console.log("Function found at ", line);
-    //     let info = line.split(":")[1];
-    //     let infoArray = info.split("-");
-
-    //     let name = infoArray[0]
-    //     name = name.trim();
-    //     name = name.replace(/ /g,"_");
-
-    //     let args = infoArray[1] || ''
-    //     args = args.trim()
-    //     // console.log("Func name:", name)
-    //     result = result.replace(new RegExp(`\b${match[0]}\b`, 'g'), match[0] + '{') 
-
-    //     let newLine = `function ${name}(${args || ''}){`
-
-    //     console.log("New line:", newLine);
-
-    //     // note about starting regex: myRegex.lastIndex = 3
-    // });
+    
+    result = replacePhrases(result)
 
 
-    let lines = src.split("\n")
+    let lines = result.split("\n")
     // console.log(lines);
 
     let inFunc = false;
 
     let exports = [];
-
-    let scopeStack = [null];
 
     lines = lines.filter((l,index)=>{
         if(!l || !l.trim()){
@@ -94,7 +100,7 @@ function compile(src, config){
         }
 
         
-        console.log(l, lineTabCount, nextLineTabCount)
+        // console.log(l, lineTabCount, nextLineTabCount)
 
         
         
@@ -130,6 +136,7 @@ function compile(src, config){
             // note about starting regex: myRegex.lastIndex = 3
         
         }else{
+
             let li = l.split("=");
             let assignment = "";
             let expression = "";
@@ -158,12 +165,6 @@ function compile(src, config){
 
     })
 
-    while(scopeStack[scopeStack.length-1]>0 && scopeStack[scopeStack.length-1]!=null){
-        newLines.push("}")
-        scopeStack.pop();
-    }
-
-    console.log(scopeStack)
 
     console.log(newLines);
 

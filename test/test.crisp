@@ -2,7 +2,8 @@
 Functionality: Login - username, password, expected
     Open Browser
     Write Username - username
-    value = Write Password - password
+    value = Write password to password
+    
     Check - expected
 
 Functionality: Test Login

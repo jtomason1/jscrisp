@@ -8,7 +8,7 @@ function Write_Username(username){
     console.log("Wrote username "+username);
 }
 
-phrases.push({phrase:"Write .* to password", func: Write_Password})
+phrases.push({phrase:"Write %s to password", func: Write_Password})
 function Write_Password(pass){
     console.log("Write_Password "+pass);
 }
