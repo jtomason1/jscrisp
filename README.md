@@ -46,9 +46,7 @@ Comments: // - left alone, acts as js comment
 JS Line: * ;  will be left alone, allows js lines
     Foudn with regex: ;\n
 
-Scope: Tabbing is responsible for scoping - will be captured with `{}` in output js code
-    { placed wit \n[^\s].*\n\s*
-    } placed with: (\s*\n)
+Scope: Certain keywords will cause new scopes to be entered/exited
 
 Call function:
     Match: Any line not matched with another
@@ -81,7 +79,10 @@ _keyword_:
 - function: Functionality, Function
 <!-- - special_function: Scenario, Test Case, Feature, Scenario Outline, Examples
 - obj: Configuration, Object, Settings, Data
-- arr: Dataset, Array, List -->
+- arr: Dataset, Array, List 
+- schema: Schema - To be added, can enforce structure to coded objects
+
+-->
 
 _args_
 csv of args

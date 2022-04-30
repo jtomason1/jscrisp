@@ -12,7 +12,7 @@ function replacePhrases(src){
             const phraseRegex = new RegExp(phrase.replace("%s", ".*"));
             // phrase did match, convert to non-phrased function call
 
-            console.log("My phrase regex", phraseRegex)
+            // console.log("My phrase regex", phraseRegex)
             if(phraseRegex.test(line)){
                 console.log("FOUND IT")
                 const phraseParts = phrase.split("%s");
@@ -113,51 +113,9 @@ function compile(src, config){
         }else if(funcRegex.test(l)){
             inFunc = true;
                 
-            const line = l;
-            // console.log("Function found at ", line);
-            let info = line.split(":")[1];
-            let infoArray = info.split("-");
-
-            let name = infoArray[0]
-            name = name.trim();
-            name = name.replace(/ /g,"_");
-
-            let args = infoArray[1] || ''
-            args = args.trim()
-            // console.log("Func name:", name)
-            result = result.replace(new RegExp(`\b${l}\b`, 'g'), l + '{') 
-
-            newLine = `function ${name}(${args || ''})`
-            exports.push(name);
-
-            // console.log("New line:", newLine);
-
-
-            // note about starting regex: myRegex.lastIndex = 3
-        
+            newLine = transpileFunctionLine({l, exports})
         }else{
-
-            let li = l.split("=");
-            let assignment = "";
-            let expression = "";
-            if(li.length>1){
-                assignment = `${li[0].trim()} = `
-                expression = li[1];
-            }else{
-                expression = li[0]
-            }
-            let stepArr = expression.split("-");
-            let call = stepArr[0].trim();
-            call = call.replace(/ /g,"_");
-
-            let args = stepArr[1]|| "";
-            args = args.trim()
-
-            const tab = inFunc ? "    " : "";
-
-            newLine = `${tab}${assignment}${call}(${args})`
-
-
+            newLine = transpileDefaultLine({l});
         }
 
         
@@ -178,6 +136,53 @@ function compile(src, config){
 
 
     return result;
+}
+
+
+    // note about starting regex: myRegex.lastIndex = 3
+
+function transpileFunctionLine({l, exports}){
+
+    const line = l;
+    // console.log("Function found at ", line);
+    let info = line.split(":")[1];
+    let infoArray = info.split("-");
+
+    let name = infoArray[0]
+    name = name.trim();
+    name = name.replace(/ /g,"_");
+
+    let args = infoArray[1] || ''
+    args = args.trim()
+    // console.log("Func name:", name)
+    // result = result.replace(new RegExp(`\b${l}\b`, 'g'), l + '{') 
+
+    exports.push(name);
+    return `function ${name}(${args || ''})`
+}
+
+function transpileDefaultLine({l}){
+
+    let li = l.split("=");
+    let assignment = "";
+    let expression = "";
+    if(li.length>1){
+        assignment = `${li[0]} = `
+        expression = li[1];
+    }else{
+        expression = li[0]
+    }
+    let stepArr = expression.split("-");
+    let call = stepArr[0].trim();
+    call = call.replace(/ /g,"_");
+
+    let args = stepArr[1]|| "";
+    args = args.trim()
+
+
+    return `${assignment}${call}(${args})`
+
+
 }
 
 const getAllFiles = function(dirPath, arrayOfFiles) {
