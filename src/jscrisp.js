@@ -57,7 +57,7 @@ function compile(src, config){
     let lines = result.split("\n")
     // console.log(lines);
 
-    let inFunc = false;
+    let funcStack = [];
 
     let exports = [];
 
@@ -75,56 +75,39 @@ function compile(src, config){
         const funcRegex = new RegExp(".*: .*");
         const jsLineRegex = new RegExp(".*;");
         const jsCommentRegex = new RegExp(".*//.*");
-
-        
-
-        // above tested lines do not affect scope
-
-        let nextLine = "";
-        if(index+1<lines.length){
-            nextLine = lines[index+1];
-        }
-
-        const lineTabCount = l.length - l.trimStart().length
-        const nextLineTabCount = nextLine.length - nextLine.trimStart().length;
-        let startScope = false;
-        let endScope = false;
-
-
-        if(lineTabCount==nextLineTabCount){
-            // no change in scope
-        }else if(lineTabCount<nextLineTabCount){
-            startScope = true;
-        }else if(lineTabCount>nextLineTabCount){
-            endScope = true;
-        }
-
-        
-        // console.log(l, lineTabCount, nextLineTabCount)
-
-        
+        const closeStackRegex = new RegExp(".*---.*");
         
         let newLine = l;
+
 
         if(jsLineRegex.test(l)){
             newLine = l;
         }else if(jsCommentRegex.test(l)){
             newLine = l;
+        }else if(closeStackRegex.test(l)){
+            newLine = "";
+            while(funcStack.length>0){
+                funcStack.pop();
+                newLine += "}"
+            }
         }else if(funcRegex.test(l)){
-            inFunc = true;
-                
-            newLine = transpileFunctionLine({l, exports})
+            newLine = transpileFunctionLine({l, funcStack, exports})
         }else{
             newLine = transpileDefaultLine({l});
         }
 
         
-        return `${newLine}${endScope ? "}" : ""}${startScope ? "{" : ""}`;
+        return `${newLine}`;
 
     })
 
 
     console.log(newLines);
+
+    while(funcStack.length>0){
+        funcStack.pop();
+        newLines.push("}")
+    }
 
     const exportLine = `module.exports = {${exports.join(",")}}`
     newLines.push(exportLine);
@@ -141,11 +124,12 @@ function compile(src, config){
 
     // note about starting regex: myRegex.lastIndex = 3
 
-function transpileFunctionLine({l, exports}){
+function transpileFunctionLine({l, funcStack, exports}){
 
     const line = l;
     // console.log("Function found at ", line);
     let info = line.split(":")[1];
+    let type = line.split(":")[0];
     let infoArray = info.split("-");
 
     let name = infoArray[0]
@@ -157,8 +141,16 @@ function transpileFunctionLine({l, exports}){
     // console.log("Func name:", name)
     // result = result.replace(new RegExp(`\b${l}\b`, 'g'), l + '{') 
 
+    let endScope = false;
+    // this will be changed based on type
+    if(funcStack.length>0){
+        funcStack.pop();
+        endScope = true;
+    }
+
     exports.push(name);
-    return `function ${name}(${args || ''})`
+    funcStack.push(name);
+    return `${endScope?"}":""}function ${name}(${args || ''}){`
 }
 
 function transpileDefaultLine({l}){
